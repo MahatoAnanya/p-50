@@ -7,7 +7,7 @@
   var backGround, invisibleGround, backgroundImage;
    
   var obstaclesGroup, obstacle1, obstacle2, obstacle3, obstacle4;
-
+  var butterfliesGroup;
 
   var score;
   var gameOverImg,restartImg;
@@ -63,7 +63,7 @@
 
 
   obstaclesGroup = createGroup()
-  butterflyGroup = createGroup()
+  butterfliesGroup = createGroup()
 
   score = 0
 
@@ -92,13 +92,94 @@ if(keyDown("space") && girl.y >= 100){
  girl.velocityY = -12;
   jumpSound.play();
 }
-if(butterflyGroup.isTouching(girl)){
+
+girl.velocityY = girl.velocityY + 0.8
+
+spawnButterflies()
+spawnObstacles()
+
+if(butterfliesGroup.isTouching(girl)){
   score += 1
 }
 
+if(obstaclesGroup.isTouching(girl)){
+  gameState = END;
+  butterfliesGroup.destroyEach()
+}
+else if (gameState === END){
+  gameOver.visible=true
+  restart.visible=true
+
+  girl.changeAnimation("collided",girl_collided);
+
+
+  backGround.velocityX = 0
+
+  obstaclesGroup.setLifetimeEach(-1);
+  butterfliesGroup.setLifetimeEach(-1)
+}
 
   //girl.velocityY = girl.velocityY + 0.8
-
+if(mousePressedOver(restart)){
+  reset();
+}
 
   drawSprites();
+
 }
+function reset(){
+  gameState=PLAY
+  obstaclesGroup.destroyEach()
+  girl.changeAnimation("running",girl_running)
+  gameOver.visible=false
+  restart.visible=false
+  score=0
+}
+
+function spawnButterflies(){
+  if (frameCount % 150 === 0) {
+
+    var butterfly = createSprite(camera.position.x+500,330,40,10);
+
+    butterfly.debug=true;
+   butterfly.velocityX = -(6 + 3*score/100)
+   butterfly.scale = 0.6;
+    
+    
+              
+    butterfly.scale = 0.05;
+     
+     butterfly.lifetime = 400;
+    
+     butterfly.setCollider("rectangle",0,0,butterfly.width/2,butterfly.height/2)
+    
+    butterfliesGroup.add(butterfly);
+    
+}
+}
+
+function spawnObstacles(){
+  if(frameCount % 120 === 0) {
+
+    var obstacle = createSprite(camera.position.x+400,330,40,40);
+    obstacle.setCollider("rectangle",0,0,200,200)
+    obstacle.addImage(obstacle1);
+    obstacle.velocityX = -(6 + 3*score/100)
+    obstacle.scale = 0.15;
+              
+    obstacle.debug=true    
+    obstacle.lifetime = 400;
+    
+    obstaclesGroup.add(obstacle);
+    
+  }
+}
+
+
+
+
+
+
+
+
+
